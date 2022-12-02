@@ -96,7 +96,7 @@ This is shorthand to open VS Code with the scope of whatever folder you're in, i
 
 ## Run the Code
 
-Inside VS Code, you should now be able to navigate to the src/DayXX.kt files, and right click on them and choose `Run Code`. Any output from the files should be placed in the output window at the bottom of VS Code.
+Inside VS Code, you should now be able to navigate to the src/DayXX.kt files, and right click on them and choose `Run Code`. Any output from the files should be placed in the output window at the bottom of VS Code. You will need to add the associated day's input file from [Advent of Code](https://adventofcode.com) alongside the DayXX.kt files. For instance, you can copy and paste your input file from AOC into Day01.txt right next to Day01.kt to run the Day 1 solution.
 
 ## If I Forgot Anything
 
