@@ -2,6 +2,8 @@
 
 This year I decided I'd learn the [Kotlin](https://kotlinlang.org) language while working on solutions for Advent of Code. 😅 Hopefully I can get past the day 10 hump without life getting in the way this year, but should be a fun learning experience nonetheless. 
 
+The solutions that are provided here are probably not the "best way" of doing things. I'm looking forward to learning along the way and figuring out different ways to accomplish these problems with Kotlin 🙌.
+
 If you'd like to follow along, I'll provide the steps below that I took to get this all up and running. This should allow you to go from Fresh Windows install to running the code in this repository.
 
 # Getting Started With Kotlin in VS Code on Windows 11 🏃
