@@ -4,3 +4,4 @@ build
 src/**/*.txt
 *.jar
 bin/*
+.vscode/*
