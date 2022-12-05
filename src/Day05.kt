@@ -20,6 +20,7 @@ fun main() {
             stacksBetterCrane = stacks.map { it.map { it }.toMutableList() }.toMutableList()
             return@forEach
         }
+        // This skips over the 1, 2, 3, 4 line that denotes the stack number for the crates
         if (!it.contains("[") && !rulesStarted) return@forEach
         
         if (!rulesStarted) {
