@@ -1,6 +1,5 @@
 import java.io.File
 
-// I'm not proud of this, but it works.
 fun main() {        
     
     var directions: List<String> = File("Day10.txt").readLines()    

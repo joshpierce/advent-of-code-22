@@ -1,6 +1,5 @@
 import java.io.File
 
-// I'm not proud of this, but it works.
 fun main() {        
     
     var directions: List<String> = File("Day09.txt").readLines()    
@@ -20,7 +19,7 @@ fun main() {
     moves.forEach { 
         // Uncomment to display the move instructions for the head
         // println(it.number.toString() + " " + it.direction.toString())
-        
+
         // For the number of times the move needs to be made
         for (i in 1..it.number) {
             movesMade.add("Head Moved: " + it.direction.toString())

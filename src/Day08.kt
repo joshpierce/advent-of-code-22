@@ -1,6 +1,5 @@
 import java.io.File
 
-// I'm not proud of this, but it works.
 fun main() {        
     var lines: List<String> = File("Day08.txt").readLines()    
     // Setup our Forest List of Lists
