@@ -1,8 +1,14 @@
 import java.io.File
+import kotlin.collections.fill
+import java.math.BigInteger
 
 // So... this returned a couple possible solutions for part 2, the first one that came out ended up being correct
 // and it's 01:28a so I'm going to bed. Hopefully I'll find time tomorrow to come back to this to clean it up.
 fun main() {        
+
+    var validMin: Int = 0
+    var validMax: Int = 20
+    var rowCheck: Int = 10
     
     var directions: List<String> = File("Day15.txt").readLines()    
     var sbpairs: MutableList<Pair<Pair<Int, Int>, Pair<Int, Int>>> = directions.map {
@@ -16,7 +22,7 @@ fun main() {
     // get all x and y values with the same euclidian distance to the beacon in a specified row
     var points: MutableSet<Pair<Int, Int>> = mutableSetOf()
     sbpairs.forEach {
-        var possPoints = getPoints(it.first, it.second, 2000000)
+        var possPoints = getPoints(it.first, it.second, rowCheck)
         var beacons = sbpairs.map { it.second }
         possPoints.forEach {
             if (!beacons.contains(it)) {
@@ -25,38 +31,82 @@ fun main() {
         }
     }
     println("Part 1 Answer: ${points.size}")
+    println()
 
-    // var ranges: MutableList<Pair<Pair<Int, Int>, Pair<Int, Int>>> = sbpairs.map {
-    //     val distance = getDistance(it.first, it.second)
-    //     Pair(Pair(it.first.first - distance, it.first.first + distance), Pair(it.first.second - distance, it.first.second + distance))
-    // }.toMutableList()
     var possPoints: MutableList<Pair<Int, Int>> = mutableListOf()
     sbpairs.forEach {
+        //println("Getting Diamond For ${it.first.toString()} to ${it.second.toString()}")
         possPoints.addAll(getDiamondOutsides(it.first, it.second))       
     }
 
-    var distressLocation: Pair<Int, Int> = Pair(0, 0)
-    possPoints.filter({ it.first >= -5 && it.second >= -5 && it.first <= 4000005 && it.second <= 4000005 })
-              .forEach poss@ { possPoint ->
-        var beacons: List<SBPair> = sbpairs.map { SBPair(it.first, it.second, getDistance(it.first, it.second)) }
-        var pointsAround = getPointsAround(possPoint)
-        pointsAround.forEach around@ { pointAround ->
-            var isValid = true
-            beacons.forEach beacon@ { beacon ->
-                if (getDistance(pointAround, beacon.start) < beacon.distance) {
-                    isValid = false
-                    return@beacon
+    // Don't run this for the large grid or you're going to have a bad time
+    // var innerPoints: MutableList<Pair<Int, Int>> = mutableListOf()
+    // sbpairs.forEach {
+    //     innerPoints.addAll(getPoints(it.first, it.second, -1))
+    // }
+    // for (i in validMin..validMax) {
+    //     for (j in validMin..validMax) {
+    //         if (sbpairs.map { it.second }.contains(Pair(j, i))) {
+    //             print("🟣")
+    //         }
+    //         else if (sbpairs.map { it.first }.contains(Pair(j, i))) {
+    //             print("🟢")
+    //         }
+    //         else if (innerPoints.contains(Pair(j, i))) {
+    //             print("⚫️")
+    //         } else {
+    //             print("🤪")
+    //         }
+    //     }
+    //     println()
+    // }
+
+    // Sort the possible points by x and then y so that we can find duplicates
+    possPoints.sortWith(compareBy({ it.first }, { it.second }))
+    
+    // Run through the list sequentially and tally up the duplicates
+    var dups: MutableList<Pair<Pair<Int, Int>, Int>> = mutableListOf()
+    var i: Int = 0
+    while (i <= possPoints.size - 1) {
+        if (possPoints[i].first >= validMin && possPoints[i].first <= validMax && possPoints[i].second >= validMin && possPoints[i].second <= validMax && i < possPoints.size - 1) {
+            if (possPoints[i] == possPoints[i+1]) {
+                var count = 1
+                while (possPoints[i] == possPoints[i+count]) {
+                    count++
                 }
+                
+                dups.add(Pair(possPoints[i], count))
+                i += (count - 1)
+            } else {
+                i++
             }
-            if (isValid && pointAround.first >= 0 && pointAround.second <= 4000000) {
-                println("Found a valid point: ${pointAround.toString()} | ${(pointAround.first.toInt() * 4000000) + pointAround.second.toInt()}")
-                distressLocation = pointAround
-                return@poss
+        } else {
+            i++
+        }
+    }
+    // Sort the duplicates by the number of duplicates to test the most likely locations first
+    dups.sortByDescending({ it.second })
+    // Get a map of our sensors and beacons and distances for testing
+    var beacons: List<SBPair> = sbpairs.map { SBPair(it.first, it.second, getDistance(it.first, it.second)) }
+    var distressLocation: Pair<Int, Int> = Pair(0, 0)
+    dups.forEach dups@ { dup ->
+        //println("Testing For Distress Location @ ${dup.first.toString()} | ${dup.second} duplicates")
+
+        var isValid = true
+        beacons.forEach beacon@ { beacon ->
+            if (getDistance(dup.first, beacon.start) <= beacon.distance) {
+                isValid = false
+                return@beacon
             }
+        }
+        if (isValid) {
+            //println("Found our distress location: ${dup.first.toString()}")
+            distressLocation = dup.first
+            return@dups
         }
     }
 
-    println("Part 2 Answer: ${distressLocation.toString()}")
+    println("Part 2 Answer: | ${(BigInteger(distressLocation.first.toInt().toString()).multiply(BigInteger("4000000"))).plus(BigInteger(distressLocation.second.toInt().toString()))}")
 }
 
 class SBPair(start: Pair<Int, Int>, end: Pair<Int, Int>, distance: Int) {
@@ -85,20 +135,12 @@ fun getDistance(start: Pair<Int, Int>, end: Pair<Int, Int>): Int {
 }
 
 fun getDiamondOutsides(start: Pair<Int, Int>, end: Pair<Int, Int>): MutableList<Pair<Int, Int>> {
-    // println("Testing: ${start.toString()} to ${end.toString()}")
     val points: MutableList<Pair<Int, Int>> = mutableListOf()
-    val distance = getDistance(start, end)
-    // println("Distance: $distance")
+    // Adding 1 to the distance to get the points just outside the diamond
+    val distance = getDistance(start, end) + 1
     points.add(Pair(start.first, start.second - distance ))
-    var direction = DiamondDirection.DOWNLEFT
-    // println("Points: ${points.toString()}")
-    var i = 0
+    var direction = DiamondDirection.DOWNLEFT    
     do {
-        // if (i < 50) {
-        //     println("Current Direction: ${direction.toString()}")
-        //     println("Current Points: ${points.toString()}")
-        //     i++
-        // }
         if (direction == DiamondDirection.DOWNLEFT) {
             points.add(Pair(points.last().first - 1, points.last().second + 1))
             
@@ -127,14 +169,25 @@ fun getDiamondOutsides(start: Pair<Int, Int>, end: Pair<Int, Int>): MutableList<
 fun getPoints(start: Pair<Int, Int>, end: Pair<Int, Int>, row: Int): List<Pair<Int, Int>> {
     val points: MutableList<Pair<Int, Int>> = mutableListOf()    
     val distance = getDistance(start, end)  
-    println("Distance: $distance")  
     
-    for (i in (start.first-distance)..(start.first+distance)) {
-        var testXDiff = start.first - i
-        var testYDiff = start.second - row
-        if (Math.abs(testXDiff) + Math.abs(testYDiff) <= distance) {
-            points.add(Pair(i, row))
-        }              
+    if (row != -1) {
+        for (i in (start.first-distance)..(start.first+distance)) {
+            var testXDiff = start.first - i
+            var testYDiff = start.second - row
+            if (Math.abs(testXDiff) + Math.abs(testYDiff) <= distance) {
+                points.add(Pair(i, row))
+            }              
+        }
+    } else {
+        for (i in (start.first-distance)..(start.first+distance)) {
+            for (j in (start.second-distance)..(start.second+distance)) {
+                var testXDiff = start.first - i
+                var testYDiff = start.second - j
+                if (Math.abs(testXDiff) + Math.abs(testYDiff) <= distance) {
+                    points.add(Pair(i, j))
+                }              
+            }
+        }
     }
     return points
 }
