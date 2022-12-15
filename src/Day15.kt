@@ -7,8 +7,8 @@ import java.math.BigInteger
 fun main() {        
 
     var validMin: Int = 0
-    var validMax: Int = 20
-    var rowCheck: Int = 10
+    var validMax: Int = 4000000
+    var rowCheck: Int = 2000000
     
     var directions: List<String> = File("Day15.txt").readLines()    
     var sbpairs: MutableList<Pair<Pair<Int, Int>, Pair<Int, Int>>> = directions.map {
@@ -35,7 +35,7 @@ fun main() {
 
     var possPoints: MutableList<Pair<Int, Int>> = mutableListOf()
     sbpairs.forEach {
-        //println("Getting Diamond For ${it.first.toString()} to ${it.second.toString()}")
+        println("Getting Diamond For ${it.first.toString()} to ${it.second.toString()}")
         possPoints.addAll(getDiamondOutsides(it.first, it.second))       
     }
 
@@ -138,31 +138,15 @@ fun getDiamondOutsides(start: Pair<Int, Int>, end: Pair<Int, Int>): MutableList<
     val points: MutableList<Pair<Int, Int>> = mutableListOf()
     // Adding 1 to the distance to get the points just outside the diamond
     val distance = getDistance(start, end) + 1
-    points.add(Pair(start.first, start.second - distance ))
-    var direction = DiamondDirection.DOWNLEFT    
+    var iterator = Pair(0,distance)
     do {
-        if (direction == DiamondDirection.DOWNLEFT) {
-            points.add(Pair(points.last().first - 1, points.last().second + 1))
-            
-            if (points.last().second == start.second) {
-                direction = DiamondDirection.DOWNRIGHT
-            }            
-        } else if (direction == DiamondDirection.DOWNRIGHT) {
-            points.add(Pair(points.last().first + 1, points.last().second + 1))
-            
-            if (points.last().first == start.first) {
-                direction = DiamondDirection.UPRIGHT
-            }
-        } else if (direction == DiamondDirection.UPRIGHT) {
-            points.add(Pair(points.last().first + 1, points.last().second - 1))
-            
-            if (points.last().second == start.second) {
-                direction = DiamondDirection.UPLEFT
-            }
-        } else if (direction == DiamondDirection.UPLEFT) {
-            points.add(Pair(points.last().first - 1, points.last().second - 1))
-        }       
-    } while(points.last() != Pair(start.first, start.second - distance))
+        if (iterator.second != 0) points.add(Pair(start.first + iterator.first, start.second + iterator.second))
+        if (iterator.second != 0) points.add(Pair(start.first + iterator.first, start.second - iterator.second))
+        if (iterator.first != 0) points.add(Pair(start.first - iterator.first, start.second + iterator.second))
+        if (iterator.first != 0) points.add(Pair(start.first - iterator.first, start.second - iterator.second))
+        iterator = Pair(iterator.first + 1, iterator.second - 1)
+    } while (iterator.second != 0)
+    
     return points
 }
 
