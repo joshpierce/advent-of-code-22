@@ -35,7 +35,7 @@ fun main() {
 
     var possPoints: MutableList<Pair<Int, Int>> = mutableListOf()
     sbpairs.forEach {
-        println("Getting Diamond For ${it.first.toString()} to ${it.second.toString()}")
+        //println("Getting Diamond For ${it.first.toString()} to ${it.second.toString()}")
         possPoints.addAll(getDiamondOutsides(it.first, it.second))       
     }
 
@@ -89,20 +89,22 @@ fun main() {
     // Get a map of our sensors and beacons and distances for testing
     var beacons: List<SBPair> = sbpairs.map { SBPair(it.first, it.second, getDistance(it.first, it.second)) }
     var distressLocation: Pair<Int, Int> = Pair(0, 0)
-    dups.forEach dups@ { dup ->
-        //println("Testing For Distress Location @ ${dup.first.toString()} | ${dup.second} duplicates")
+    run dups@ {
+        dups.forEach { dup ->
+            //println("Testing For Distress Location @ ${dup.first.toString()} | ${dup.second} duplicates")
 
-        var isValid = true
-        beacons.forEach beacon@ { beacon ->
-            if (getDistance(dup.first, beacon.start) <= beacon.distance) {
-                isValid = false
-                return@beacon
+            var isValid = true
+            beacons.forEach beacon@ { beacon ->
+                if (getDistance(dup.first, beacon.start) <= beacon.distance) {
+                    isValid = false
+                    return@beacon
+                }
             }
-        }
-        if (isValid) {
-            //println("Found our distress location: ${dup.first.toString()}")
-            distressLocation = dup.first
-            return@dups
+            if (isValid) {
+                //println("Found our distress location: ${dup.first.toString()}")
+                distressLocation = dup.first
+                return@dups
+            }
         }
     }
 
